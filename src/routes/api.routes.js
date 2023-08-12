@@ -7,11 +7,12 @@ const { userLoginAdapter } = require('../middlewares/userLoginAdapter');
 
 router.get('/users/:email', async (req, res) => {
     const { email } = req.params;
-
+    console.log(email);
     try {
-        // TODO
-        const selectedUser = {};
+        
 
+        const selectedUser = await UserController.findByEmail(email);
+        
         if (!selectedUser) {
             throw new Error();
         }
@@ -32,12 +33,12 @@ router.post('/login/:email', userLoginAdapter, async (req, res) => {
 router.post('/users', userCreationAdapter, async (req, res) => {
     const encryptedUser = req.encryptedUser;
 
-    try {
-        // TODO
-
+    try {        
+        const result = await UserController.createUser(req.body.user);
+                
         if(!encryptedUser) throw new Error();
-
-        return res.status(201).json({});
+        
+        return res.status(201).json(JSON.stringify(result.dataValues));
     } catch (error) {
         console.log(error);
         return res.status(400).end();
@@ -46,11 +47,9 @@ router.post('/users', userCreationAdapter, async (req, res) => {
 
 router.put('/users/:id', userUpdateAdapter, async (req, res) => {
     const { id } = req.params;
-    const updatedUser = req.updatedUser;
-
-    try {
-        // TODO
-
+    const updatedUser = req.updatedUser;    
+    try {                
+        await UserController.updateUserInfo(id,updatedUser);
         return res.status(202).end();
     } catch (error) {
         console.log(error);
@@ -63,8 +62,11 @@ router.delete('/users/:id', async (req, res) => {
 
     try {
 
-        // TODO
-
+        result = await UserController.findById(id);
+        if(result===null){
+            throw new Error();
+        }
+        await UserController.deleteUser(result.dataValues.id);
         return res.status(204).end();
     } catch (error) {
         console.log(error);
