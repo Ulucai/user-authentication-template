@@ -26,19 +26,22 @@ router.get('/users/:email', async (req, res) => {
 
 router.post('/login/:email', userLoginAdapter, async (req, res) => {
     const user = req.user;
-
     return res.status(200).json(user);
 });
 
 router.post('/users', userCreationAdapter, async (req, res) => {
     const encryptedUser = req.encryptedUser;
 
-    try {        
-        const result = await UserController.createUser(req.body.user);
-                
+    try {
         if(!encryptedUser) throw new Error();
+        if(await UserController.findByEmail(encryptedUser.email))
+            return res.status(400).end();
         
-        return res.status(201).json(JSON.stringify(result.dataValues));
+        const result = await UserController.createUser(encryptedUser);        
+        createdUser = result.dataValues;
+        console.log("Req: \n",encryptedUser,"\nEND\n")
+        console.log("Created:\n",createdUser,"\nEND\n")
+        return res.status(201).json(createdUser);
     } catch (error) {
         console.log(error);
         return res.status(400).end();

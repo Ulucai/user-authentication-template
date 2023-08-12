@@ -32,6 +32,11 @@ async function registerUser(user) {
         });
 
         if (response.status !== 201) {
+            /*if(!response.status === 400)
+                throw new Error('Email já cadastrado!');
+            else
+                
+            */
             throw new Error();
         }
 
@@ -43,6 +48,7 @@ async function registerUser(user) {
 
         window.location.href = `${BASE_URL}/profile`
     } catch (error) {
+        console.log("erro",error);
         bootstrap.Toast.getOrCreateInstance(errorToast).show();
     }
 
